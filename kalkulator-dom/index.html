@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator</title>
+    <script src="jsdom.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h3>Kalkulator Sederhana</h3>
+    <!-- wrapper input start -->
+    <div class="wrapper-input">
+        <!-- wrapper operation -->
+        <div class="wrapper-operation">
+            <form class="input-group">
+                <span>
+                    <div class="input-1">
+                        <p>Angka 1 <input type="text" id="angka1"></p>
+                  
+                    </div>
+                </span>
+                <span class="block-operator"></span>
+                <span>
+                    <div class="input-2">
+                       
+                        <p>Angka 2 <input type="text" id="angka2"></p>
+                    </div>
+                </span>
+            </form>
+            <!-- operator group -->
+            <div class="operator-group">
+                  <p>Operator <button onclick="tambah()">+</button>
+                    <button onclick="kurang()">-</button>
+                    <button onclick="kali()">x</button>
+                    <button onclick="bagi()">/</button>
+                    
+            </div>
+            <!-- button reset -->
+            <button class="reset-content" type="reset" onclick="reset()">RESET</button>
+
+        </div>
+        <!-- display result -->
+        <div class="display-result">  <h2 id ="hasil"></h2></div>
+    </div>
+    <!-- wrapper input end -->
+</div>
+<!-- container end -->
+
+<!-- connecting to javascript file -->
+<script src="script.js"></script>
+</body>
+
+</html>
