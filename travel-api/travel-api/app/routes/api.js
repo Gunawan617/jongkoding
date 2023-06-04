@@ -1,21 +1,32 @@
 const express = require('express');
 const apiRoute = express.Router();
+const carController = require('../controllers/car');
 const userController = require('../controllers/user');
 const roleController = require('../controllers/role');
 const orderController = require('../controllers/order');
+const terminalController = require('../controllers/terminal');
 const destinationController = require('../controllers/destination');
 const auth = require('../controllers/verifyJwtToken');
 
-apiRoute.get('/', function(req, res) {
+apiRoute.get('/', function (req, res) {
   res.send({
     judul: 'Panduan API',
     users: {
-      judul: 'Daftar dan login user',
+      judul: 'Mengelola users, daftar dan login',
       endpointSignUp: '[POST]: /auth/signup',
-      requestBodySignUp: 'name, email, password, address, role = (USER, STAFF, PM, ADMIN)',
+      requestBodySignUp: {
+        name: 'STRING',
+        email: 'STRING UNIQUE',
+        password: 'STRING',
+        address: 'STRING',
+        role: 'ENUM (USER, STAFF, PM, ADMIN)',
+      },
       deskripsiSignUp: 'Mendaftarkan user baru',
       endpointSignIn: '[POST]: /auth/signin',
-      requestBodySignIn: 'email, password',
+      requestBodySignIn: {
+        email: 'STRING UNIQUE',
+        password: 'STRING',
+      },
       deskripsiSignIn: 'Login user untuk mendapatkan accessToken',
     },
     roles: {
@@ -26,11 +37,17 @@ apiRoute.get('/', function(req, res) {
       deskripsiRoleUsers: 'Menampilkan daftar users berdasarkan role',
     },
     order: {
-      judul: 'Menampilkan data order',
+      judul: 'Mengelola bagian order/booking',
       endpointOrder: '[GET]: /order',
       deskripsiorder: 'Menampilkan order anda (login user)',
       endpointOrderAdd: '[POST]: /order',
-      requestBodyOrderAdd: 'from_location - to_location (JAKARTA, BANDUNG, YOGYAKARTA), payment_method, go_date (yyyy-mm-dd hh:mm:ss), car (pilih 1-5)',
+      requestBodyOrderAdd: {
+        from_location: 'STRING (sementara tersedia: JAKARTA, BANDUNG, YOGYAKARTA)',
+        to_location: 'STRING',
+        payment_method: 'STRING',
+        go_date: 'DATE',
+        car: 'INTEGER (sementara tersedia: 1, 2, 3, 4, 5)',
+      },
       deskripsiorderAdd: 'Menampilkan order anda (login user)',
       endpointOrderAdmin: '[GET]: /order/admin',
       deskripsiOrderAdmin: 'Menampilkan semua data order [Role PM keatas]',
@@ -38,12 +55,38 @@ apiRoute.get('/', function(req, res) {
       deskripsiOrderFind: 'Mencara order berdasarkan tix_id',
     },
     destination: {
-      judul: 'Menampilkan destinasi/rute travel kami',
+      judul: 'Mengelola bagian destinasi/rute travel',
       endpointDestination: '[GET]: /destination',
       deskripsiDestination: 'Menampilkan semua destinasi',
       endpointDestinationAdd: '[POST]: /destination',
-      requestBodyDestinationAdd: 'from_location - to_location (PASTIKAN MENAMBAH KOTA BARU DULU), price, mileage',
+      requestBodyDestinationAdd: {
+        from_location: 'STRING (sementara tersedia: JAKARTA, BANDUNG, YOGYAKARTA)',
+        to_location: 'STRING',
+        price: 'INTEGER',
+        mileage: 'INTEGER',
+      },
       deskripsiDestinationAdd: 'Menambahkan destinasi kota yang belum terdaftar [Role PM Keatas]',
+    },
+    city: {
+      judul: 'Mengelola bagian kota',
+      endpointCity: '[GET]: /city',
+      deskripsiCity: 'Menampilkan list kota yang terdaftar',
+      endpointCityAdd: '[POST]: /city',
+      requestBodyCityAdd: {
+        name: 'STRING',
+      },
+      deskripsiCityAdd: 'Menambah kota baru untuk jadi rute destinasi [Role PM Keatas]',
+    },
+    car: {
+      judul: 'Mengelola bagian kendaraan',
+      endpointCity: '[GET]: /car',
+      deskripsiCity: 'Menampilkan list kendaraan yang terdaftar',
+      endpointCityAdd: '[POST]: /car',
+      requestBodyCityAdd: {
+        name: 'STRING',
+        license: 'STRING UNIQUE',
+      },
+      deskripsiCityAdd: 'Menambah unit kendaraan baru [Role PM Keatas]',
     },
   });
 });
@@ -159,6 +202,54 @@ apiRoute.get('/destination', (req, res) => {
 apiRoute.post('/destination', (req, res) => {
   try {
     auth.verifyToken(req, res, destinationController.create, 3);
+  } catch (err) {
+    console.log('>> Error: ' + err);
+    res.status(400).send({
+      request_status: false,
+      message: err.message,
+    });
+  }
+});
+
+apiRoute.get('/city', (req, res) => {
+  try {
+    auth.verifyToken(req, res, terminalController.findAll);
+  } catch (err) {
+    console.log('>> Error: ' + err);
+    res.status(400).send({
+      request_status: false,
+      message: err.message,
+    });
+  }
+});
+
+apiRoute.post('/city', (req, res) => {
+  try {
+    auth.verifyToken(req, res, terminalController.create, 3);
+  } catch (err) {
+    console.log('>> Error: ' + err);
+    res.status(400).send({
+      request_status: false,
+      message: err.message,
+    });
+  }
+});
+
+apiRoute.get('/car', (req, res) => {
+  try {
+    auth.verifyToken(req, res, carController.findAll);
+  } catch (err) {
+    console.log('>> Error: ' + err);
+    res.status(400).send({
+      request_status: false,
+      message: err.message,
+    });
+  }
+});
+
+apiRoute.post('/car', (req, res) => {
+  try {
+    auth.verifyToken(req, res, carController.create, 3);
   } catch (err) {
     console.log('>> Error: ' + err);
     res.status(400).send({
